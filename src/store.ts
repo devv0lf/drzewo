@@ -49,6 +49,7 @@ export const useStore = create<State>((set, get) => ({
       data = await storage.load();
     } catch (e) {
       set({ saveError: `Nie udało się wczytać danych: ${(e as Error).message}` });
+      return;
     }
     let settings = get().settings;
     try {

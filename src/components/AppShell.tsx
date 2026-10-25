@@ -3,6 +3,7 @@ import { BarChart3, Clock, Map, Network, Plus, Settings } from "lucide-react";
 import type { ReactNode } from "react";
 import { useStore } from "@/store";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const NAV = [
   { to: "/", label: "Drzewo", icon: Network },
@@ -50,8 +51,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             </Link>
           ))}
         </nav>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-3">
           <SaveIndicator />
+          <button
+            onClick={() => void supabase.auth.signOut()}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Wyloguj
+          </button>
         </div>
       </header>
 
