@@ -1,6 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { BarChart3, Clock, Map, Network, Plus, Settings } from "lucide-react";
-import logoAsset from "@/assets/drzewo-logo.png.asset.json";
+import logo from "@/assets/drzewo-logo.png";
 import type { ReactNode } from "react";
 import { useStore } from "@/store";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="flex h-dvh flex-col">
       <header className="no-print hidden items-center gap-6 border-b bg-card px-6 py-2 md:flex">
         <Link to="/" className="flex items-center gap-2 font-serif text-xl font-semibold text-primary">
-          <img src={logoAsset.url} alt="Logo Drzewo" className="size-8 rounded-lg" />
+          <img src={logo} alt="Logo Drzewo" className="size-8 rounded-lg" />
           Drzewo rodzinne
         </Link>
         <nav className="flex gap-1" aria-label="Główna nawigacja">
