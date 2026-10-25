@@ -4,7 +4,11 @@ import type { FuzzyDate, Person } from "@/lib/model";
 import { uid } from "@/lib/model";
 import { geocode, type GeoResult } from "@/lib/places";
 import { fullName } from "@/lib/relations";
-import { lifeSpan } from "@/lib/dates";
+import { formatDateValue, lifeSpan, normalizeDateInput } from "@/lib/dates";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { pl } from "date-fns/locale";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useStore } from "@/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,52 +28,128 @@ export function Field({ label, children, hint }: { label: string; children: Reac
 }
 
 type Q = "exact" | "about" | "before" | "after" | "between";
+
+function toDate(v?: string): Date | undefined {
+  if (!v) return undefined;
+  const [y, m = "1", d = "1"] = v.split("-");
+  return new Date(+y, +m - 1, +d);
+}
+function fromDate(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${String(d.getFullYear()).padStart(4, "0")}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+function DatePart({
+  label,
+  text,
+  setText,
+  onValue,
+  placeholder,
+}: {
+  label: string;
+  text: string;
+  setText: (s: string) => void;
+  onValue: (v?: string) => void;
+  placeholder: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const norm = normalizeDateInput(text);
+  const invalid = !!text.trim() && !norm;
+  const selected = toDate(norm);
+  return (
+    <div className="space-y-1">
+      <div className="flex gap-1">
+        <Input
+          aria-label={label}
+          placeholder={placeholder}
+          className="h-11 w-40"
+          value={text}
+          aria-invalid={invalid}
+          onChange={(e) => {
+            setText(e.target.value);
+            const n = normalizeDateInput(e.target.value);
+            if (!e.target.value.trim()) onValue(undefined);
+            else if (n) onValue(n);
+          }}
+          onBlur={() => norm && setText(norm)}
+        />
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button type="button" variant="outline" size="icon" className="size-11" aria-label={`${label} – wybierz z kalendarza`}>
+              <CalendarIcon className="size-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              locale={pl}
+              captionLayout="dropdown"
+              startMonth={new Date(1500, 0)}
+              endMonth={new Date(new Date().getFullYear(), 11)}
+              selected={selected}
+              defaultMonth={selected ?? new Date(1950, 0)}
+              onSelect={(d) => {
+                if (!d) return;
+                const v = fromDate(d);
+                setText(v);
+                onValue(v);
+                setOpen(false);
+              }}
+              className="p-3 pointer-events-auto"
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+      {invalid ? (
+        <span className="block text-xs text-destructive">Nieprawidłowa data – wpisz np. 1920, 05.1920 lub 14.05.1920</span>
+      ) : norm ? (
+        <span className="block text-xs text-muted-foreground">{formatDateValue(norm)}</span>
+      ) : null}
+    </div>
+  );
+}
+
 export function DateInput({ value, onChange }: { value?: FuzzyDate; onChange: (d?: FuzzyDate) => void }) {
   const q: Q = value?.qualifier ?? (value?.approx ? "about" : "exact");
   const [text, setText] = useState(value?.value ?? "");
   const [end, setEnd] = useState(value?.valueEnd ?? "");
-  const valid = (s: string) => /^\d{4}(-\d{2}(-\d{2})?)?$/.test(s);
-  const emit = (t: string, qq: Q, e: string) => {
-    if (!t) return onChange(undefined);
-    if (!valid(t)) return;
+  const emit = (v: string | undefined, qq: Q, e: string | undefined) => {
+    if (!v) return onChange(undefined);
     onChange({
-      value: t,
+      value: v,
       approx: qq === "about",
       qualifier: qq === "exact" ? undefined : qq,
-      valueEnd: qq === "between" && valid(e) ? e : undefined,
+      valueEnd: qq === "between" ? e : undefined,
     });
   };
   return (
-    <div className="flex flex-wrap gap-2">
-      <select aria-label="Dokładność daty" className={`${selectCls} w-32`} value={q} onChange={(e) => emit(text, e.target.value as Q, end)}>
+    <div className="flex flex-wrap items-start gap-2">
+      <select
+        aria-label="Dokładność daty"
+        className={`${selectCls} w-32`}
+        value={q}
+        onChange={(e) => emit(normalizeDateInput(text), e.target.value as Q, normalizeDateInput(end))}
+      >
         <option value="exact">dokładnie</option>
         <option value="about">około</option>
         <option value="before">przed</option>
         <option value="after">po</option>
         <option value="between">między</option>
       </select>
-      <Input
-        aria-label="Data"
-        placeholder="RRRR lub RRRR-MM-DD"
-        inputMode="numeric"
-        className="h-11 w-40"
-        value={text}
-        aria-invalid={!!text && !valid(text)}
-        onChange={(e) => {
-          setText(e.target.value);
-          emit(e.target.value, q, end);
-        }}
+      <DatePart
+        label="Data"
+        placeholder="DD.MM.RRRR lub RRRR"
+        text={text}
+        setText={setText}
+        onValue={(v) => emit(v, q, normalizeDateInput(end))}
       />
       {q === "between" && (
-        <Input
-          aria-label="Data końcowa"
-          placeholder="a RRRR"
-          className="h-11 w-32"
-          value={end}
-          onChange={(e) => {
-            setEnd(e.target.value);
-            emit(text, q, e.target.value);
-          }}
+        <DatePart
+          label="Data końcowa"
+          placeholder="a… (DD.MM.RRRR)"
+          text={end}
+          setText={setEnd}
+          onValue={(v) => emit(normalizeDateInput(text), q, v)}
         />
       )}
     </div>
