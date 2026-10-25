@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import logoAsset from "@/assets/drzewo-logo.png.asset.json";
+import logo from "@/assets/drzewo-logo.png";
 
 export function AuthGate({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
@@ -41,7 +41,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-xl border border-border bg-card p-6 shadow-sm">
-        <img src={logoAsset.url} alt="Logo Drzewo" className="mx-auto size-20" />
+        <img src={logo} alt="Logo Drzewo" className="mx-auto size-20" />
         <h1 className="text-center font-serif text-2xl font-semibold text-foreground">Drzewo rodzinne</h1>
         <p className="text-sm text-muted-foreground">
           {mode === "in" ? "Zaloguj się, aby zobaczyć swoje drzewo." : "Załóż konto — drzewo zapisze się w chmurze."}
