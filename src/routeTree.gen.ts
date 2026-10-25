@@ -10,8 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as KopieRouteImport } from './routes/kopie'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as OsCzasuRouteImport } from './routes/os-czasu'
+import { Route as StatystykiRouteImport } from './routes/statystyki'
+import { Route as UstawieniaRouteImport } from './routes/ustawienia'
 import { Route as OsobaIdRouteImport } from './routes/osoba.$id'
 import { Route as OsobaNowaRouteImport } from './routes/osoba.nowa'
 import { Route as OsobaIdEdytujRouteImport } from './routes/osoba.$id_.edytuj'
@@ -19,6 +22,11 @@ import { Route as OsobaIdEdytujRouteImport } from './routes/osoba.$id_.edytuj'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KopieRoute = KopieRouteImport.update({
+  id: '/kopie',
+  path: '/kopie',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MapaRoute = MapaRouteImport.update({
@@ -29,6 +37,16 @@ const MapaRoute = MapaRouteImport.update({
 const OsCzasuRoute = OsCzasuRouteImport.update({
   id: '/os-czasu',
   path: '/os-czasu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatystykiRoute = StatystykiRouteImport.update({
+  id: '/statystyki',
+  path: '/statystyki',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UstawieniaRoute = UstawieniaRouteImport.update({
+  id: '/ustawienia',
+  path: '/ustawienia',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OsobaIdRoute = OsobaIdRouteImport.update({
@@ -49,16 +67,22 @@ const OsobaIdEdytujRoute = OsobaIdEdytujRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/kopie': typeof KopieRoute
   '/mapa': typeof MapaRoute
   '/os-czasu': typeof OsCzasuRoute
+  '/statystyki': typeof StatystykiRoute
+  '/ustawienia': typeof UstawieniaRoute
   '/osoba/$id': typeof OsobaIdRoute
   '/osoba/nowa': typeof OsobaNowaRoute
   '/osoba/$id/edytuj': typeof OsobaIdEdytujRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/kopie': typeof KopieRoute
   '/mapa': typeof MapaRoute
   '/os-czasu': typeof OsCzasuRoute
+  '/statystyki': typeof StatystykiRoute
+  '/ustawienia': typeof UstawieniaRoute
   '/osoba/$id': typeof OsobaIdRoute
   '/osoba/nowa': typeof OsobaNowaRoute
   '/osoba/$id/edytuj': typeof OsobaIdEdytujRoute
@@ -66,8 +90,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/kopie': typeof KopieRoute
   '/mapa': typeof MapaRoute
   '/os-czasu': typeof OsCzasuRoute
+  '/statystyki': typeof StatystykiRoute
+  '/ustawienia': typeof UstawieniaRoute
   '/osoba/$id': typeof OsobaIdRoute
   '/osoba/nowa': typeof OsobaNowaRoute
   '/osoba/$id_/edytuj': typeof OsobaIdEdytujRoute
@@ -76,24 +103,33 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/kopie'
     | '/mapa'
     | '/os-czasu'
+    | '/statystyki'
+    | '/ustawienia'
     | '/osoba/$id'
     | '/osoba/nowa'
     | '/osoba/$id/edytuj'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/kopie'
     | '/mapa'
     | '/os-czasu'
+    | '/statystyki'
+    | '/ustawienia'
     | '/osoba/$id'
     | '/osoba/nowa'
     | '/osoba/$id/edytuj'
   id:
     | '__root__'
     | '/'
+    | '/kopie'
     | '/mapa'
     | '/os-czasu'
+    | '/statystyki'
+    | '/ustawienia'
     | '/osoba/$id'
     | '/osoba/nowa'
     | '/osoba/$id_/edytuj'
@@ -101,8 +137,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  KopieRoute: typeof KopieRoute
   MapaRoute: typeof MapaRoute
   OsCzasuRoute: typeof OsCzasuRoute
+  StatystykiRoute: typeof StatystykiRoute
+  UstawieniaRoute: typeof UstawieniaRoute
   OsobaIdRoute: typeof OsobaIdRoute
   OsobaNowaRoute: typeof OsobaNowaRoute
   OsobaIdEdytujRoute: typeof OsobaIdEdytujRoute
@@ -117,6 +156,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kopie': {
+      id: '/kopie'
+      path: '/kopie'
+      fullPath: '/kopie'
+      preLoaderRoute: typeof KopieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mapa': {
       id: '/mapa'
       path: '/mapa'
@@ -129,6 +175,20 @@ declare module '@tanstack/react-router' {
       path: '/os-czasu'
       fullPath: '/os-czasu'
       preLoaderRoute: typeof OsCzasuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/statystyki': {
+      id: '/statystyki'
+      path: '/statystyki'
+      fullPath: '/statystyki'
+      preLoaderRoute: typeof StatystykiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ustawienia': {
+      id: '/ustawienia'
+      path: '/ustawienia'
+      fullPath: '/ustawienia'
+      preLoaderRoute: typeof UstawieniaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/osoba/$id': {
@@ -157,8 +217,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  KopieRoute: KopieRoute,
   MapaRoute: MapaRoute,
   OsCzasuRoute: OsCzasuRoute,
+  StatystykiRoute: StatystykiRoute,
+  UstawieniaRoute: UstawieniaRoute,
   OsobaIdRoute: OsobaIdRoute,
   OsobaNowaRoute: OsobaNowaRoute,
   OsobaIdEdytujRoute: OsobaIdEdytujRoute,
