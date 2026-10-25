@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ExternalLink, Pencil, Trash2, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Children, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { formatDate, lifeSpan, sortEvents } from "@/lib/dates";
 import { EVENT_LABELS, PARENT_TYPE_LABELS, SOURCE_TYPE_LABELS, type Person } from "@/lib/model";
@@ -285,8 +285,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     </section>
   );
 }
-function Group({ label, children }: { label: string; children: React.ReactNode[] }) {
-  const items = children.filter(Boolean);
+function Group({ label, children }: { label: string; children: ReactNode }) {
+  const items = Children.toArray(children);
   if (!items.length) return null;
   return (
     <div className="mb-2">
