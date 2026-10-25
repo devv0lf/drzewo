@@ -71,7 +71,7 @@ export const useStore = create<State>((set, get) => ({
     saveTimer = setTimeout(async () => {
       try {
         const saved = await storage.save(get().data, prev.revision);
-        set({ data: saved, lastSaved: new Date(), saveError: undefined });
+        set({ data: { ...get().data, revision: saved.revision }, lastSaved: new Date(), saveError: undefined });
         // snapshot at most every 2 minutes, plus always on destructive actions
         if (Date.now() - lastBackupAt > 120_000 || label.startsWith("!")) {
           lastBackupAt = Date.now();
