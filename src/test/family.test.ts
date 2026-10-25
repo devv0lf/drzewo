@@ -16,6 +16,27 @@ describe("relationship", () => {
   it("cousin of father", () => expect(relationship("andrzej", "michael", d)).toBe("Kuzyn"));
 });
 
+describe("in-laws", () => {
+  const base = {
+    nameVariants: [], unions: [], events: [], notes: "", photos: [], living: true,
+  };
+  const data = {
+    ...d,
+    people: [
+      { ...base, id: "dad", firstName: "Ojciec", lastName: "", gender: "m" as const, parents: [] },
+      { ...base, id: "me", firstName: "Ja", lastName: "", gender: "m" as const, parents: [{ personId: "dad", type: "biological" as const }] },
+      { ...base, id: "sis", firstName: "Siostra", lastName: "", gender: "f" as const, parents: [{ personId: "dad", type: "biological" as const }],
+        unions: [{ id: "u1", partnerId: "bil", type: "marriage" as const, status: "married" as const }] },
+      { ...base, id: "bil", firstName: "Mąż", lastName: "", gender: "m" as const, parents: [] },
+      { ...base, id: "wife", firstName: "Żona", lastName: "", gender: "f" as const, parents: [],
+        unions: [{ id: "u2", partnerId: "me", type: "marriage" as const, status: "married" as const }] },
+    ],
+  };
+  it("sister's husband is szwagier, without infinite loop", () => expect(relationship("me", "bil", data)).toBe("Szwagier"));
+  it("brother's wife sees husband's sister as szwagierka", () => expect(relationship("wife", "sis", data)).toBe("Szwagierka"));
+  it("wife's view of sister's husband", () => expect(relationship("wife", "bil", data)).toBe("Szwagier"));
+});
+
 describe("validation", () => {
   it("death before birth", () => {
     const p = { ...d.people.find((x) => x.id === "jan")! };
