@@ -151,7 +151,7 @@ export function TreeView({ focusId, selectedId, onSelect }: Props) {
         aria-label="Drzewo rodzinne"
       >
         <div
-          className="absolute left-0 top-0 origin-top-left transition-transform duration-75"
+          className="absolute left-0 top-0 origin-top-left"
           style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})` }}
         >
           <svg
@@ -334,23 +334,19 @@ function PersonNode({
           </div>
         </div>
       </button>
-      {(node.hiddenParents || node.hiddenChildren || collapsed) && (
+      {node.gen !== 0 && (
         <button
           type="button"
           onClick={onToggle}
           aria-label={collapsed ? "Rozwiń gałąź" : "Zwiń gałąź"}
-          className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full border bg-card text-muted-foreground shadow-card"
+          title={collapsed ? "Rozwiń gałąź" : "Zwiń gałąź"}
+          className={cn(
+            "absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full border bg-card shadow-card",
+            collapsed ? "text-primary" : "text-muted-foreground",
+          )}
         >
-          {collapsed ? <ChevronDown className="size-4" /> : node.hiddenParents ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+          {node.gen < 0 ? (collapsed ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />) : collapsed ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
         </button>
-      )}
-      {!collapsed && node.gen !== 0 && !node.hiddenParents && !node.hiddenChildren && (
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-label="Zwiń gałąź"
-          className="absolute -right-2 -top-2 hidden size-6 items-center justify-center rounded-full border bg-card text-muted-foreground shadow-card group-hover:flex"
-        />
       )}
     </div>
   );
