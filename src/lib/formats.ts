@@ -1,4 +1,4 @@
-import yaml from "js-yaml";
+import * as yaml from "js-yaml";
 import type { FamilyData, LifeEvent, Person, Place } from "./model";
 import { SCHEMA_VERSION } from "./model";
 
