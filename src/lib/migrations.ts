@@ -5,7 +5,7 @@ type Raw = Record<string, unknown> & { schemaVersion?: number };
 /** Ordered migrations: key N upgrades a document from version N to N+1. */
 const MIGRATIONS: Record<number, (d: Raw) => Raw> = {
   // 0 -> 1: documents without a version get defaults
-  0: (d) => ({ ...d, schemaVersion: 1, revision: d.revision ?? 0, sources: d.sources ?? [] }),
+  0: (d) => ({ ...d, schemaVersion: 1, revision: d['revision'] ?? 0, sources: d['sources'] ?? [] }),
 };
 
 export function migrate(input: unknown): unknown {

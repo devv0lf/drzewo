@@ -8,7 +8,7 @@ export function toJSON(d: FamilyData) {
 
 /** YAML with all strings quoted so dates and place names never get coerced. */
 export function toYAML(d: FamilyData) {
-  return yaml.dump(d, { quotingType: '"', forceQuotes: true, lineWidth: 120 });
+  return yaml.dump(d, { forceQuotes: true, lineWidth: 120 } as Parameters<typeof yaml.dump>[1]);
 }
 export function fromYAML(s: string): unknown {
   return yaml.load(s);
