@@ -59,3 +59,35 @@ export function lifeSpan(p: Person): string {
 export function sortEvents(events: LifeEvent[]): LifeEvent[] {
   return [...events].sort((a, b) => dateKey(a.date) - dateKey(b.date));
 }
+
+/**
+ * Normalizes user-typed dates to ISO-like partial form (RRRR, RRRR-MM, RRRR-MM-DD).
+ * Accepts Polish order (DD.MM.RRRR, DD-MM-RRRR, DD/MM/RRRR, MM.RRRR) and ISO.
+ * Returns undefined when the input is not a valid calendar date.
+ */
+export function normalizeDateInput(raw: string): string | undefined {
+  const s = raw.trim();
+  if (!s) return undefined;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const check = (y: number, m?: number, d?: number): string | undefined => {
+    if (y < 1 || y > 9999) return undefined;
+    if (m === undefined) return String(y).padStart(4, "0");
+    if (m < 1 || m > 12) return undefined;
+    if (d === undefined) return `${String(y).padStart(4, "0")}-${pad(m)}`;
+    const max = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    if (d < 1 || d > max) return undefined;
+    return `${String(y).padStart(4, "0")}-${pad(m)}-${pad(d)}`;
+  };
+  let m: RegExpMatchArray | null;
+  if ((m = s.match(/^(\d{4})$/))) return check(+m[1]);
+  if ((m = s.match(/^(\d{4})[-./](\d{1,2})$/))) return check(+m[1], +m[2]);
+  if ((m = s.match(/^(\d{4})[-./](\d{1,2})[-./](\d{1,2})$/))) return check(+m[1], +m[2], +m[3]);
+  if ((m = s.match(/^(\d{1,2})[-./](\d{4})$/))) return check(+m[2], +m[1]);
+  if ((m = s.match(/^(\d{1,2})[-./](\d{1,2})[-./](\d{4})$/))) return check(+m[3], +m[2], +m[1]);
+  return undefined;
+}
+
+/** Human-readable Polish preview of a normalized date value. */
+export function formatDateValue(v: string): string {
+  return fmtValue(v);
+}
