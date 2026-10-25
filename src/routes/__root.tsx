@@ -78,7 +78,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Drzewo rodzinne" },
       { name: "description", content: "Proste, ciepłe drzewo genealogiczne Twojej rodziny." },
-      { name: "theme-color", content: "#C2683F" },
+      { name: "theme-color", content: "#453F3C" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
