@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OsobaIdRouteImport } from './routes/osoba.$id'
+import { Route as OsobaNowaRouteImport } from './routes/osoba.nowa'
+import { Route as OsobaIdEdytujRouteImport } from './routes/osoba.$id_.edytuj'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +24,49 @@ const OsobaIdRoute = OsobaIdRouteImport.update({
   path: '/osoba/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OsobaNowaRoute = OsobaNowaRouteImport.update({
+  id: '/osoba/nowa',
+  path: '/osoba/nowa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OsobaIdEdytujRoute = OsobaIdEdytujRouteImport.update({
+  id: '/osoba/$id_/edytuj',
+  path: '/osoba/$id/edytuj',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/osoba/$id': typeof OsobaIdRoute
+  '/osoba/nowa': typeof OsobaNowaRoute
+  '/osoba/$id/edytuj': typeof OsobaIdEdytujRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/osoba/$id': typeof OsobaIdRoute
+  '/osoba/nowa': typeof OsobaNowaRoute
+  '/osoba/$id/edytuj': typeof OsobaIdEdytujRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/osoba/$id': typeof OsobaIdRoute
+  '/osoba/nowa': typeof OsobaNowaRoute
+  '/osoba/$id_/edytuj': typeof OsobaIdEdytujRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/osoba/$id'
+  fullPaths: '/' | '/osoba/$id' | '/osoba/nowa' | '/osoba/$id/edytuj'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/osoba/$id'
-  id: '__root__' | '/' | '/osoba/$id'
+  to: '/' | '/osoba/$id' | '/osoba/nowa' | '/osoba/$id/edytuj'
+  id: '__root__' | '/' | '/osoba/$id' | '/osoba/nowa' | '/osoba/$id_/edytuj'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   OsobaIdRoute: typeof OsobaIdRoute
+  OsobaNowaRoute: typeof OsobaNowaRoute
+  OsobaIdEdytujRoute: typeof OsobaIdEdytujRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +85,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OsobaIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/osoba/nowa': {
+      id: '/osoba/nowa'
+      path: '/osoba/nowa'
+      fullPath: '/osoba/nowa'
+      preLoaderRoute: typeof OsobaNowaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/osoba/$id_/edytuj': {
+      id: '/osoba/$id_/edytuj'
+      path: '/osoba/$id/edytuj'
+      fullPath: '/osoba/$id/edytuj'
+      preLoaderRoute: typeof OsobaIdEdytujRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   OsobaIdRoute: OsobaIdRoute,
+  OsobaNowaRoute: OsobaNowaRoute,
+  OsobaIdEdytujRoute: OsobaIdEdytujRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
