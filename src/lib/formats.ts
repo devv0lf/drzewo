@@ -241,11 +241,18 @@ export function fromGEDCOM(text: string): FamilyData {
     const b = p.events.find((e) => e.type === "birth")?.date;
     p.living = !p.events.some((e) => e.type === "death" || e.type === "burial") && !!b && now - parseInt(b.value) < 100;
   }
+  const validPlaces = [...places.values()].filter((p) => !isNaN(p.lat) && !isNaN(p.lng));
+  const ok = new Set(validPlaces.map((p) => p.id));
+  for (const p of people.values()) for (const e of p.events) if (e.placeId && !ok.has(e.placeId)) {
+    const name = places.get(e.placeId)?.name;
+    e.description = [e.description, name].filter(Boolean).join(" — ");
+    e.placeId = undefined;
+  }
   return {
     schemaVersion: SCHEMA_VERSION,
     revision: 0,
     people: [...people.values()],
-    places: [...places.values()].filter((p) => !isNaN(p.lat) && !isNaN(p.lng)),
+    places: validPlaces,
     sources: [],
   };
 }
