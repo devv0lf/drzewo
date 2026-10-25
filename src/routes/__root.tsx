@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { AppShell } from "@/components/AppShell";
 import { Toaster } from "@/components/ui/sonner";
 import { useStore } from "@/store";
+import { AuthGate } from "@/components/AuthGate";
 
 function NotFoundComponent() {
   return (
@@ -113,19 +114,29 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
+function SignedInApp() {
   const init = useStore((s) => s.init);
   useEffect(() => {
     void init();
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) document.documentElement.classList.add("dark");
   }, [init]);
+  return (
+    <AppShell>
+      <Outlet />
+    </AppShell>
+  );
+}
+
+function RootComponent() {
+  const { queryClient } = Route.useRouteContext();
+  useEffect(() => {
+    if (window.matchMedia("(prefers-color-scheme: dark)").matches) document.documentElement.classList.add("dark");
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppShell>
-        <Outlet />
-      </AppShell>
+      <AuthGate>
+        <SignedInApp />
+      </AuthGate>
       <Toaster position="top-center" />
     </QueryClientProvider>
   );
