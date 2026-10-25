@@ -100,12 +100,25 @@ export function relationship(meId: string, targetId: string, data: FamilyData): 
   }
 
   if (!best) {
-    // in-law via partner
-    for (const partner of partnersOf(me, data)) {
-      const r = relationship(partner.id, targetId, { ...data, people: data.people });
-      if (r.startsWith("Matka") || r.startsWith("Ojciec") || r.startsWith("Rodzic"))
-        return g(t, "Teść", "Teściowa", "Teść(ciowa)");
-      if (r.startsWith("Brat") || r.startsWith("Siostra")) return g(t, "Szwagier", "Szwagierka", "Szwagier(ka)");
+    // in-laws (no recursion, so partner cycles can never loop)
+    const isSibling = (a: Person, bId: string) => {
+      const s = siblingsOf(a, data);
+      return [...s.full, ...s.half].some((x) => x.id === bId);
+    };
+    const myPartners = partnersOf(me, data);
+    for (const partner of myPartners) {
+      if (partner.parents.some((l) => l.personId === targetId)) return g(t, "Teść", "Teściowa", "Teść(ciowa)");
+      if (isSibling(partner, targetId)) return g(t, "Szwagier", "Szwagierka", "Szwagier(ka)");
+    }
+    const mySibs = siblingsOf(me, data);
+    for (const sib of [...mySibs.full, ...mySibs.half]) {
+      if (partnersOf(sib, data).some((x) => x.id === targetId)) return g(t, "Szwagier", "Szwagierka", "Szwagier(ka)");
+    }
+    for (const partner of myPartners) {
+      const ps = siblingsOf(partner, data);
+      for (const sib of [...ps.full, ...ps.half]) {
+        if (partnersOf(sib, data).some((x) => x.id === targetId)) return g(t, "Szwagier", "Szwagierka", "Szwagier(ka)");
+      }
     }
     for (const c of childrenOf(meId, data)) {
       if (partnersOf(c, data).some((x) => x.id === targetId)) return g(t, "Zięć", "Synowa", "Zięć / synowa");
