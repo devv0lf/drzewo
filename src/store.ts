@@ -58,7 +58,8 @@ export const useStore = create<State>((set, get) => ({
     }
     if (!data) {
       data = makeDemoData();
-      settings.meId ??= "tomasz";
+      settings = { ...settings, meId: settings.meId ?? "tomasz" };
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
       data = await storage.save(data, -1);
     }
     set({ data, settings, loaded: true, lastSaved: new Date() });
