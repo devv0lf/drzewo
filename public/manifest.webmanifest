@@ -1,0 +1,10 @@
+{
+  "name": "Drzewo rodzinne",
+  "short_name": "Drzewo",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FBF6EE",
+  "theme_color": "#C2683F",
+  "lang": "pl",
+  "icons": [{ "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" }]
+}
