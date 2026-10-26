@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as KopieRouteImport } from './routes/kopie'
 import { Route as MapaRouteImport } from './routes/mapa'
 import { Route as OsCzasuRouteImport } from './routes/os-czasu'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as StatystykiRouteImport } from './routes/statystyki'
 import { Route as UstawieniaRouteImport } from './routes/ustawienia'
 import { Route as OsobaIdRouteImport } from './routes/osoba.$id'
@@ -37,6 +38,11 @@ const MapaRoute = MapaRouteImport.update({
 const OsCzasuRoute = OsCzasuRouteImport.update({
   id: '/os-czasu',
   path: '/os-czasu',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StatystykiRoute = StatystykiRouteImport.update({
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/kopie': typeof KopieRoute
   '/mapa': typeof MapaRoute
   '/os-czasu': typeof OsCzasuRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/statystyki': typeof StatystykiRoute
   '/ustawienia': typeof UstawieniaRoute
   '/osoba/$id': typeof OsobaIdRoute
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/kopie': typeof KopieRoute
   '/mapa': typeof MapaRoute
   '/os-czasu': typeof OsCzasuRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/statystyki': typeof StatystykiRoute
   '/ustawienia': typeof UstawieniaRoute
   '/osoba/$id': typeof OsobaIdRoute
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/kopie': typeof KopieRoute
   '/mapa': typeof MapaRoute
   '/os-czasu': typeof OsCzasuRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/statystyki': typeof StatystykiRoute
   '/ustawienia': typeof UstawieniaRoute
   '/osoba/$id': typeof OsobaIdRoute
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/kopie'
     | '/mapa'
     | '/os-czasu'
+    | '/reset-password'
     | '/statystyki'
     | '/ustawienia'
     | '/osoba/$id'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/kopie'
     | '/mapa'
     | '/os-czasu'
+    | '/reset-password'
     | '/statystyki'
     | '/ustawienia'
     | '/osoba/$id'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/kopie'
     | '/mapa'
     | '/os-czasu'
+    | '/reset-password'
     | '/statystyki'
     | '/ustawienia'
     | '/osoba/$id'
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   KopieRoute: typeof KopieRoute
   MapaRoute: typeof MapaRoute
   OsCzasuRoute: typeof OsCzasuRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   StatystykiRoute: typeof StatystykiRoute
   UstawieniaRoute: typeof UstawieniaRoute
   OsobaIdRoute: typeof OsobaIdRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/os-czasu'
       fullPath: '/os-czasu'
       preLoaderRoute: typeof OsCzasuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/statystyki': {
@@ -220,6 +240,7 @@ const rootRouteChildren: RootRouteChildren = {
   KopieRoute: KopieRoute,
   MapaRoute: MapaRoute,
   OsCzasuRoute: OsCzasuRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   StatystykiRoute: StatystykiRoute,
   UstawieniaRoute: UstawieniaRoute,
   OsobaIdRoute: OsobaIdRoute,
