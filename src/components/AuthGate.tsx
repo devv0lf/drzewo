@@ -1,8 +1,12 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/drzewo-logo.png";
+
+// Publiczny klucz witryny Cloudflare Turnstile (sekretny klucz jest w panelu Supabase)
+const TURNSTILE_SITE_KEY = "0x4AAAAAAFm1vcjI5I0JL5rV";
 
 type Mode = "in" | "up" | "forgot";
 
@@ -18,6 +22,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<Mode>("in");
   const [recovery, setRecovery] = useState(false); // wejście z linku „reset hasła” z e-maila
   const [busy, setBusy] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<TurnstileInstance | undefined>(undefined);
 
   const [linkError, setLinkError] = useState<string | null>(null);
 
@@ -40,15 +46,26 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (session === undefined) return null;
   if (session && !recovery) return <>{children}</>;
 
+  function resetCaptcha() {
+    setCaptchaToken(null);
+    captchaRef.current?.reset();
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!captchaToken) {
+      toast.error("Potwierdź, że nie jesteś robotem.");
+      return;
+    }
     setBusy(true);
 
     if (mode === "forgot") {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
+        captchaToken,
       });
       setBusy(false);
+      resetCaptcha();
       if (error) {
         toast.error(error.message);
         return;
@@ -60,9 +77,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
     const res =
       mode === "in"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
+        ? await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } })
+        : await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin, captchaToken } });
     setBusy(false);
+    resetCaptcha();
     if (res.error) {
       toast.error(res.error.message);
       return;
@@ -140,7 +158,16 @@ export function AuthGate({ children }: { children: ReactNode }) {
             autoComplete={mode === "in" ? "current-password" : "new-password"} className={inputCls}
           />
         )}
-        <button disabled={busy} className={primaryBtnCls}>
+        <Turnstile
+          key={mode}
+          ref={captchaRef}
+          siteKey={TURNSTILE_SITE_KEY}
+          options={{ language: "pl", size: "flexible" }}
+          onSuccess={setCaptchaToken}
+          onExpire={() => setCaptchaToken(null)}
+          onError={() => setCaptchaToken(null)}
+        />
+        <button disabled={busy || !captchaToken} className={primaryBtnCls}>
           {mode === "in" && "Zaloguj"}
           {mode === "up" && "Załóż konto"}
           {mode === "forgot" && "Wyślij link do resetu"}
