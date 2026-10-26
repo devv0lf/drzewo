@@ -19,9 +19,15 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const [recovery, setRecovery] = useState(false); // wejście z linku „reset hasła” z e-maila
   const [busy, setBusy] = useState(false);
 
+  const [linkError, setLinkError] = useState<string | null>(null);
+
   useEffect(() => {
-    // link z e-maila wraca na stronę z #...type=recovery w adresie
-    if (/type=recovery/.test(window.location.hash)) setRecovery(true);
+    // link z e-maila wraca na /reset-password (lub z #type=recovery w adresie)
+    const hash = window.location.hash;
+    const onResetPage = window.location.pathname.startsWith("/reset-password");
+    if (onResetPage || /type=recovery/.test(hash)) setRecovery(true);
+    const err = new URLSearchParams(hash.replace(/^#/, "")).get("error_description");
+    if (err) setLinkError(err.replace(/\+/g, " "));
     const { data } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
       if (event === "PASSWORD_RECOVERY") setRecovery(true);
@@ -39,7 +45,9 @@ export function AuthGate({ children }: { children: ReactNode }) {
     setBusy(true);
 
     if (mode === "forgot") {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
       setBusy(false);
       if (error) {
         toast.error(error.message);
