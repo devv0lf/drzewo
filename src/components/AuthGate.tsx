@@ -84,7 +84,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
       return;
     }
     toast.success("Hasło zostało zmienione.");
-    window.history.replaceState(null, "", window.location.pathname);
+    window.history.replaceState(null, "", "/");
     setPassword("");
     setPassword2("");
     setRecovery(false); // sesja już istnieje, więc pokaże się aplikacja
@@ -112,11 +112,18 @@ export function AuthGate({ children }: { children: ReactNode }) {
     );
   }
 
+  const resetLinkProblem = recovery && !session;
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-xl border border-border bg-card p-6 shadow-sm">
         <img src={logo} alt="Logo Drzewo" className="mx-auto size-20" />
         <h1 className="text-center font-serif text-2xl font-semibold text-foreground">Drzewo rodzinne</h1>
+        {resetLinkProblem && (
+          <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+            Link do zmiany hasła jest nieważny lub wygasł{linkError ? ` (${linkError})` : ""}. Wyślij nowy link poniżej.
+          </p>
+        )}
         <p className="text-sm text-muted-foreground">
           {mode === "in" && "Zaloguj się, aby zobaczyć swoje drzewo."}
           {mode === "up" && "Załóż konto — drzewo zapisze się w chmurze."}
